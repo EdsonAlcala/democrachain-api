@@ -1,32 +1,58 @@
-var express = require('express');
-var router = express.Router();
-var azure = require('azure');
-var Web3 = require('web3');
-// create an instance of web3 using the HTTP provider.
-// NOTE in mist web3 is already available, so check first if its available before instantiating
-var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-var notificationHubService = azure.createNotificationHubService('democrachainhub', 'Endpoint=sb://democrachain.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=cOJJLfK1QbKGI5HupjEBlecDS4S4vGrIpoUTjxG7GUk=');
+const express = require('express');
+const router = express.Router();
+const azure = require('azure');
+const Web3 = require('web3');
+const fs = require('fs');
+let notificationHubService = azure.createNotificationHubService('democrachainhub', 'Endpoint=sb://democrachain.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=cOJJLfK1QbKGI5HupjEBlecDS4S4vGrIpoUTjxG7GUk=');
+let web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+let solc = require('solc');
+let code = fs.readFileSync('./Contracts/Voting.sol').toString();
 
-let pollContractAbi = [{ "constant": true, "inputs": [{ "name": "", "type": "uint256" }], "name": "proposals", "outputs": [{ "name": "name", "type": "string" }], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "name", "type": "string" }], "name": "newProposal", "outputs": [{ "name": "proposalID", "type": "uint256" }], "payable": false, "type": "function" }, { "anonymous": false, "inputs": [{ "indexed": false, "name": "proposalID", "type": "uint256" }, { "indexed": false, "name": "name", "type": "string" }], "name": "ProposalAdded", "type": "event" }];
+//default account
+web3.eth.defaultAccount = '0x50f1c865895556ed00c1c8c1014e7be029256c67';
+let votingContractCompiled = solc.compile(code, 1);//web3.eth.compile.solidity(code)
+//let votingContractCompiled = web3.eth.compile.solidity(code);
+//let votingContractAbi = votingContractCompiled.info.abiDefinition;
+//using solc
+let votingContractCode = "0x"+votingContractCompiled.contracts[":Voting"].bytecode;
+let votingContractAbi = JSON.parse(votingContractCompiled.contracts[":Voting"].interface);
+let votingContract = web3.eth.contract(votingContractAbi);
+let votingContractInstance;
+let deployedContract = votingContract.new(['Yes', 'No'],
+  { data: votingContractCode, from: web3.eth.defaultAccount, gas: 470000 },
+  function (err, myContract) {
+    if (!err) {
+      if (myContract.address) {
+        votingContractInstance = votingContract.at(myContract.address);
+        var numberVotes = votingContractInstance.GetTotalVotesFor.call('Yes');
+        console.log("Number of votes: " + numberVotes);
+        votingContractInstance.VoteForOption.sendTransaction('Yes', {from: web3.eth.defaultAccount}, function(err, result){
+          var newNumberOfVotes = votingContractInstance.GetTotalVotesFor.call('Yes');
+          console.log("New number of votes: " + newNumberOfVotes);
+        });
+      }
+    }
+  }
+);
 
-let pollContractAddress = '0xac959204c5be3bbfa318ba7400e15806727f6319';
 
-let pollContract = web3.eth.contract(pollContractAbi).at(pollContractAddress);
+//getting existing contract
 
 /* GET home page. */
 router.get('/', function (req, res) {
-
-  res.render('index', { title: 'Express' });
+  res.render('index', { title: 'Democrachain API' });
 });
 
 router.get('/notify', function (req, res) {
   //send notification test
   var payload = {
-    alert: 'Hello!'
+    alert: 'Edson wants to turn on the Air conditioner.'
   };
   notificationHubService.apns.send(null, payload, function (error) {
     if (!error) {
-      // notification sent
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(500);
     }
   });
 });
