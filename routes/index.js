@@ -18,33 +18,26 @@ const web3 = new Web3(new Web3.providers.HttpProvider(httpProviderUrl));
 let code = fs.readFileSync('./Contracts/Voting.sol').toString();
 
 web3.eth.defaultAccount = accountCode;
-
-// web3.personal.unlockAccount(accountCode, 'edson123', 15000, function (error, result) {
-//   if (error) {
-//     console.log(error)
-//     return;
-//   }
-//   console.log(result);
-// });
-
 let votingContractCompiled = solc.compile(code, 1);
 
 //using solc
 let votingContractCode = "0x" + votingContractCompiled.contracts[":Voting"].bytecode;
 let votingContractAbi = JSON.parse(votingContractCompiled.contracts[":Voting"].interface);
 console.log("ABI:" + votingContractCompiled.contracts[":Voting"].interface);
+
 let votingContract = web3.eth.contract(votingContractAbi);
 let votingContractInstance;
 
-router.get('/deployToRopsten', function (req, res) {
-  let httpProviderUrl = "http://23.98.223.9:8545";
-  let web3 = new Web3(new Web3.providers.HttpProvider(httpProviderUrl));
-  res.render('index', { title: 'Democrachain API' });
-});
+// router.get('/deployToRopsten', function (req, res) {
+//   let httpProviderUrl = "http://23.98.223.9:8545";
+//   let web3 = new Web3(new Web3.providers.HttpProvider(httpProviderUrl));
+//   res.render('index', { title: 'Democrachain API' });
+// });
 
+function deployNewContract(){
+  
+}
 if (process.env.NODE_ENV == 'development') {
-
-
   //deployNewContract();
   let deployedContract = votingContract.new(['Yes', 'No'],
     { data: votingContractCode, from: web3.eth.defaultAccount, gas: 470000 },
