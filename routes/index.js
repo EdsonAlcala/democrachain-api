@@ -4,17 +4,21 @@ const azure = require('azure');
 const Web3 = require('web3');
 const solc = require('solc');
 const fs = require('fs');
-const notificationHubService = azure.createNotificationHubService('democrachainhub', 'Endpoint=sb://democrachain.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=cOJJLfK1QbKGI5HupjEBlecDS4S4vGrIpoUTjxG7GUk=');
-const httpProviderUrl = process.env.NODE_ENV == 'development' ? "http://localhost:8545" : "http://23.98.223.9:8545";
-const accountCode = process.env.NODE_ENV == 'development' ? '0xba6fe142d4e0104c0fbdef7a3fd5ffa122ab712c' : '0x7688272927dcbc77858c622847ec05fb0a6fadb1';
-let web3 = new Web3(new Web3.providers.HttpProvider(httpProviderUrl));
 
+const notificationHubService = azure.createNotificationHubService('democrachainhub', 'Endpoint=sb://democrachain.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=cOJJLfK1QbKGI5HupjEBlecDS4S4vGrIpoUTjxG7GUk=');
 const rpcLocalFromAccount = '0xba6fe142d4e0104c0fbdef7a3fd5ffa122ab712c';
 const ropstenFromAccount = '0x7688272927dcbc77858c622847ec05fb0a6fadb1';
+const rpcLocalHttpURL = "http://localhost:8545";
+const ropstenHttpURL = "http://23.98.223.9:8545";
+
+const httpProviderUrl = process.env.NODE_ENV == 'development' ? rpcLocalHttpURL : ropstenHttpURL;
+const accountCode = process.env.NODE_ENV == 'development' ? rpcLocalFromAccount : ropstenFromAccount;
+const web3 = new Web3(new Web3.providers.HttpProvider(httpProviderUrl));
 
 let code = fs.readFileSync('./Contracts/Voting.sol').toString();
 
 web3.eth.defaultAccount = accountCode;
+
 // web3.personal.unlockAccount(accountCode, 'edson123', 15000, function (error, result) {
 //   if (error) {
 //     console.log(error)
@@ -63,7 +67,24 @@ if (process.env.NODE_ENV == 'development') {
 } else {
 
   if (process.env.STAGE == 'newDeployment') {
-
+    //deployNewContract();
+    let deployedContract = votingContract.new(['Yes', 'No'],
+      { data: votingContractCode, from: web3.eth.defaultAccount, gas: 470000 },
+      function (err, myContract) {
+        if (!err) {
+          if (myContract.address) {
+            console.log("Address:" + myContract.address);
+            votingContractInstance = votingContract.at(myContract.address);
+            var numberVotes = votingContractInstance.GetTotalVotesFor.call('Yes');
+            console.log("Number of votes: " + numberVotes);
+            votingContractInstance.VoteForOption.sendTransaction('Yes', { from: web3.eth.defaultAccount }, function (err, result) {
+              var newNumberOfVotes = votingContractInstance.GetTotalVotesFor.call('Yes');
+              console.log("New number of votes: " + newNumberOfVotes);
+            });
+          }
+        }
+      }
+    );
   } else {
 
   }
