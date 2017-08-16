@@ -7,11 +7,12 @@ const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('DemocrachainDB');
 
-const notificationHubService = azure.createNotificationHubService('democrachainhub', 'Endpoint=sb://democrachain.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=cOJJLfK1QbKGI5HupjEBlecDS4S4vGrIpoUTjxG7GUk=');
-const rpcLocalFromAccount = '0xa9fb5301f194aa13bc9e77cbddd39ecacdc2d947';
-const ropstenFromAccount = '0x7688272927dcbc77858c622847ec05fb0a6fadb1';
+const notificationHubService = azure.createNotificationHubService('arduinohub', 'Endpoint=sb://arduino-hub.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=bwCGaMxSAfcX2r0+ip9cQmJfCci6XOSQPIdQM2ET52E=');
+const rpcLocalFromAccount = '0xb8f85e2ce964f864f2ccec58e47859699034660d';
+const ropstenFromAccount = "0xb8f85e2ce964f864f2ccec58e47859699034660d";
 const rpcLocalHttpURL = "http://localhost:8545";
-const ropstenHttpURL = "http://23.98.223.9:8545";
+const ropstenHttpURL = "http://localhost:8545";
+
 const httpProviderUrl = process.env.NODE_ENV == 'development' ? rpcLocalHttpURL : ropstenHttpURL;
 const accountCode = process.env.NODE_ENV == 'development' ? rpcLocalFromAccount : ropstenFromAccount;
 const web3 = new Web3(new Web3.providers.HttpProvider(httpProviderUrl));
