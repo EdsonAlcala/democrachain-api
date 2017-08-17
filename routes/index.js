@@ -107,14 +107,14 @@ function getData() {
   });
 }
 
-// router.get('/information', function (req, res) {
-//   if(!readyToGetInfo){
-//     return res.sendStatus(500);
-//   }
-//   getData().then(function(result){
-//     res.json(result);
-//   });
-// });
+router.get('/information', function (req, res) {
+  if(!readyToGetInfo){
+    return res.sendStatus(500);
+  }
+  getData().then(function(result){
+    res.json(result);
+  });
+});
 
 router.get('/turnon', function (req, res) {
   if (!readyToGetInfo) {
@@ -126,17 +126,27 @@ router.get('/turnon', function (req, res) {
   getData().then(function (result) {
     votingContractInstance = votingContract.at(result.ContractAddress);
     var contractEvent = votingContractInstance.RequestAdded();
-    var contractListener = contractEvent.watch(function (error, result) {
-      if (error) {
-        console.log(error);
-        res.json(error);
-        return;
-      }
-      res.json(result);    
-      contractEvent.stopWatching();
-      console.log(result.args);
-    });
+    // var contractListener = contractEvent.watch(function (error, result) {
+    //   if (error) {
+    //     console.log(error);
+    //     res.json(error);
+    //     return;
+    //   }
+    //   res.json(result);    
+    //   contractEvent.stopWatching();
+    //   console.log(result.args);
+    // });
     votingContractInstance.RequestVoting.sendTransaction({ gas: 4712388 });
+    var payload = {
+      alert: 'Edson wants to turn on the Light.'
+    };
+    notificationHubService.apns.send(null, payload, function (error) {
+      if (!error) {
+        res.sendStatus(200);
+      } else {
+        res.sendStatus(500);
+      }
+    });
   });
 });
 
