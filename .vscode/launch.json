@@ -11,7 +11,7 @@
             "program": "${workspaceRoot}/app.js",
             "cwd": "${workspaceRoot}",
             "env": {
-                "NODE_ENV": "deployment",
+                "NODE_ENV": "development",
                 "STAGE": "newDeployment"
             }
         },

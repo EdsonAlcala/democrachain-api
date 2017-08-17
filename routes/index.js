@@ -8,7 +8,7 @@ const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('DemocrachainDB');
 
 const notificationHubService = azure.createNotificationHubService('arduinohub', 'Endpoint=sb://arduino-hub.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=bwCGaMxSAfcX2r0+ip9cQmJfCci6XOSQPIdQM2ET52E=');
-const rpcLocalFromAccount = '0xb8f85e2ce964f864f2ccec58e47859699034660d';
+const rpcLocalFromAccount = '0x6ba8644b15eab48d4d2587d2b239509082956593';
 const ropstenFromAccount = "0xb8f85e2ce964f864f2ccec58e47859699034660d";
 const rpcLocalHttpURL = "http://localhost:8545";
 const ropstenHttpURL = "http://localhost:8545";
@@ -52,7 +52,7 @@ function initializeDatabase(contractAddress, callback) {
 }
 var VOTING_TIME = 1;
 function deployNewContract() {
-  let deployedContract = votingContract.new(VOTING_TIME,
+  let deployedContract = votingContract.new(['Yes', 'No'],
     { data: votingContractCode, from: web3.eth.defaultAccount, gas: 470000 },
     function (error, myContract) {
       if (error) {
