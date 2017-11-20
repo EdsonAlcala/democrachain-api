@@ -8,10 +8,10 @@ const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('DemocrachainDB');
 
 const notificationHubService = azure.createNotificationHubService('arduinohub', 'Endpoint=sb://arduino-hub.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=bwCGaMxSAfcX2r0+ip9cQmJfCci6XOSQPIdQM2ET52E=');
-const rpcLocalFromAccount = '0xb8f85e2ce964f864f2ccec58e47859699034660d';
-const ropstenFromAccount = "0xb8f85e2ce964f864f2ccec58e47859699034660d";
-const rpcLocalHttpURL = "http://localhost:8545";
-const ropstenHttpURL = "http://localhost:8545";
+const rpcLocalFromAccount = '0x5882b20215934340ec9730ff04440b287d034af1';
+const ropstenFromAccount = "0x5882b20215934340ec9730ff04440b287d034af1";
+const rpcLocalHttpURL = "http://52.232.4.88:8545";
+const ropstenHttpURL = "http://52.232.4.88:8545";
 const httpProviderUrl = process.env.NODE_ENV == 'development' ? rpcLocalHttpURL : ropstenHttpURL;
 const accountCode = process.env.NODE_ENV == 'development' ? rpcLocalFromAccount : ropstenFromAccount;
 const web3 = new Web3(new Web3.providers.HttpProvider(httpProviderUrl));
