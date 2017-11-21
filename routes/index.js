@@ -8,10 +8,10 @@ const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('DemocrachainDB');
 
 const notificationHubService = azure.createNotificationHubService('arduinohub', 'Endpoint=sb://arduino-hub.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=bwCGaMxSAfcX2r0+ip9cQmJfCci6XOSQPIdQM2ET52E=');
-const rpcLocalFromAccount = '0x1c25ef6055f5584e42c29f63c5535a740e0bbbd7';
+const rpcLocalFromAccount = "0x1c25ef6055f5584e42c29f63c5535a740e0bbbd7";
 const ropstenFromAccount = "0x1c25ef6055f5584e42c29f63c5535a740e0bbbd7";
-const rpcLocalHttpURL = "http://localhost:8545";
-const ropstenHttpURL = "http://localhost:8545";
+const rpcLocalHttpURL = "http://52.232.4.88:8545";
+const ropstenHttpURL = "http://52.232.4.88:8545";
 const httpProviderUrl = process.env.NODE_ENV == 'development' ? rpcLocalHttpURL : ropstenHttpURL;
 const accountCode = process.env.NODE_ENV == 'development' ? rpcLocalFromAccount : ropstenFromAccount;
 const web3 = new Web3(new Web3.providers.HttpProvider(httpProviderUrl));
@@ -28,7 +28,7 @@ let votingContract = web3.eth.contract(votingContractAbi);
 let votingContractInstance;
 let readyToGetInfo = false;
 
-deployNewContract();
+//deployNewContract();
 function initializeDatabase(contractAddress, callback) {
   db.serialize(function () {
     db.run("CREATE TABLE IF NOT EXISTS Information (Name TEXT, Value TEXT)");
@@ -68,6 +68,10 @@ function deployNewContract() {
     }
   );
 }
+
+initializeDatabase("0x3175aDb322E74BD892286a5c179800338a6c835B", function () {
+  readyToGetInfo = true;
+});
 
 /* GET home page. */
 router.get('/', function (req, res) {
