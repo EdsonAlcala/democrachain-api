@@ -10,8 +10,8 @@ const db = new sqlite3.Database('DemocrachainDB');
 const notificationHubService = azure.createNotificationHubService('arduinohub', 'Endpoint=sb://arduino-hub.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=bwCGaMxSAfcX2r0+ip9cQmJfCci6XOSQPIdQM2ET52E=');
 const rpcLocalFromAccount = '0x5882b20215934340ec9730ff04440b287d034af1';
 const ropstenFromAccount = "0x5882b20215934340ec9730ff04440b287d034af1";
-const rpcLocalHttpURL = "http://52.232.4.88:8545";
-const ropstenHttpURL = "http://52.232.4.88:8545";
+const rpcLocalHttpURL = "http://localhost:8545";
+const ropstenHttpURL = "http://localhost:8545";
 const httpProviderUrl = process.env.NODE_ENV == 'development' ? rpcLocalHttpURL : ropstenHttpURL;
 const accountCode = process.env.NODE_ENV == 'development' ? rpcLocalFromAccount : ropstenFromAccount;
 const web3 = new Web3(new Web3.providers.HttpProvider(httpProviderUrl));
@@ -116,39 +116,42 @@ router.get('/information', function (req, res) {
   });
 });
 
-router.get('/turnon', function (req, res) {
-  if (!readyToGetInfo) {
-    return res.sendStatus(500);
-  }
 
-  //get from address, in the beginning there is hardcoded address but the Arduino has to know their Address, ok?
-  var fromAddress = web3.eth.defaultAccount;
-  getData().then(function (result) {
-    votingContractInstance = votingContract.at(result.ContractAddress);
-    var contractEvent = votingContractInstance.RequestAdded();
-    // var contractListener = contractEvent.watch(function (error, result) {
-    //   if (error) {
-    //     console.log(error);
-    //     res.json(error);
-    //     return;
-    //   }
-    //   res.json(result);    
-    //   contractEvent.stopWatching();
-    //   console.log(result.args);
-    // });
-    votingContractInstance.RequestVoting.sendTransaction({ gas: 4712388 });
-    var payload = {
-      alert: 'Edson wants to turn on the Light.'
-    };
-    notificationHubService.apns.send(null, payload, function (error) {
-      if (!error) {
-        res.sendStatus(200);
-      } else {
-        res.sendStatus(500);
+
+router.get('/vote', function (req, res) {
+  //i need the response as parameter
+  let approved = true;//vote
+
+  //interact with smart contract
+   var voteAddedEvent = pollContract.voteAdded();
+    voteAddedEvent.watch(function (err, result) {
+      if (err) {
+        console.log(err)
+        return;
       }
+      console.log(result.args.name)
+      // check that result.args._from is web3.eth.coinbase then
+      // display result.args._value in the UI and call    
+      // exampleEvent.stopWatching()
+      //debugger;
     });
-  });
+
+    //vote
+    pollContract.vote.sendTransaction(approved, { from: web3.eth.coinbase });
+
+  votingContractInstance.VoteForOption.sendTransaction('Yes', { from: web3.eth.defaultAccount },
+    function (error, result) {
+      if (error) {
+        console.log(error)
+        return;
+      }
+      var newNumberOfVotes = votingContractInstance.GetTotalVotesFor.call('Yes');
+      console.log("New number of votes: " + newNumberOfVotes);
+    });
+
+  res.sendStatus(200);
 });
+
 
 router.get('/notify', function (req, res) {
   //send notification test
