@@ -122,26 +122,27 @@ router.get('/information', function (req, res) {
 
 
 
-router.get('/vote', function (req, res) {
+router.get('/decline', function (req, res) {
   //i need the response as parameter
-  let approved = true;//vote
+  let approved = false;//vote
 
-  //interact with smart contract
-   var voteAddedEvent = pollContract.voteAdded();
-    voteAddedEvent.watch(function (err, result) {
-      if (err) {
-        console.log(err)
+  votingContractInstance.VoteForOption.sendTransaction('No', { from: web3.eth.defaultAccount },
+    function (error, result) {
+      if (error) {
+        console.log(error)
         return;
       }
-      console.log(result.args.name)
-      // check that result.args._from is web3.eth.coinbase then
-      // display result.args._value in the UI and call    
-      // exampleEvent.stopWatching()
-      //debugger;
+      var newNumberOfVotes = votingContractInstance.GetTotalVotesFor.call('Yes');
+      console.log("New number of votes: " + newNumberOfVotes);
     });
 
-    //vote
-    pollContract.vote.sendTransaction(approved, { from: web3.eth.coinbase });
+  res.sendStatus(200);
+});
+
+
+router.get('/approve', function (req, res) {
+  //i need the response as parameter
+  let approved = true;//vote
 
   votingContractInstance.VoteForOption.sendTransaction('Yes', { from: web3.eth.defaultAccount },
     function (error, result) {
