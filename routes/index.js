@@ -11,7 +11,7 @@ const notificationHubService = azure.createNotificationHubService('democrachainh
 const rpcLocalFromAccount = "0x1c25ef6055f5584e42c29f63c5535a740e0bbbd7";
 const ropstenFromAccount = "0x1c25ef6055f5584e42c29f63c5535a740e0bbbd7";
 const rpcLocalHttpURL = "http://localhost:8545";
-const ropstenHttpURL = "http://52.232.4.88:8545";
+const ropstenHttpURL = "http://localhost:8545";
 const httpProviderUrl = process.env.NODE_ENV == 'development' ? rpcLocalHttpURL : ropstenHttpURL;
 const accountCode = process.env.NODE_ENV == 'development' ? rpcLocalFromAccount : ropstenFromAccount;
 const web3 = new Web3(new Web3.providers.HttpProvider(httpProviderUrl));
