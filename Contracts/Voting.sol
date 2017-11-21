@@ -9,14 +9,14 @@ contract Voting {
 
     bytes32[] public options;
 
-    function Voting(bytes32[] options){
+    function Voting(bytes32[] options) {
         options = options;
     }
 
-    function GetTotalVotesFor(bytes32 option) returns(uint8){
+    function GetTotalVotesFor(bytes32 option) returns(uint8) {
         return votesReceived[option];
     }
-    function RequestVoting(){
+    function RequestVoting() {
         requests[msg.sender] += 1;
         RequestAdded(msg.sender, requests[msg.sender]);
     }
