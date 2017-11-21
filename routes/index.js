@@ -161,7 +161,7 @@ router.get('/approve', function (req, res) {
 router.get('/notify', function (req, res) {
   //send notification test
   var payload = {
-    alert: 'Edson wants to turn on the Light.'
+    alert: 'Edson wants to turn on the Air Conditioner.'
   };
   notificationHubService.apns.send(null, payload, function (error) {
     if (!error) {
