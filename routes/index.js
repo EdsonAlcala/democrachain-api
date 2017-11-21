@@ -25,7 +25,7 @@ let votingContractCompiled = solc.compile(code, 1);
 let votingContractCode = "0x" + votingContractCompiled.contracts[":Voting"].bytecode;
 let votingContractAbi = JSON.parse(votingContractCompiled.contracts[":Voting"].interface);
 let votingContract = web3.eth.contract(votingContractAbi);
-let votingContractInstance = "0x3175aDb322E74BD892286a5c179800338a6c835B";
+let votingContractInstance = votingContract.at("0x3175aDb322E74BD892286a5c179800338a6c835B");
 let readyToGetInfo = false;
 
 //deployNewContract();
